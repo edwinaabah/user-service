@@ -1,24 +1,24 @@
 pipeline {
     agent any
     environment {
-        DOCKER_HUB_CREDENTIALS = 'dockerhub-repo'
-        IMAGE1_NAME = 'davidokpe/search_service'
-        IMAGE2_NAME = 'davidokpe/nortification_service'
-        IMAGE3_NAME = 'davidokpe/payment_service'
-        REPO1_URL = 'https://github.com/ugbasawo/search_service.git'
-        REPO2_URL = 'https://github.com/ugbasawo/nortification_service.git'
+        DOCKER_HUB_CREDENTIALS = 'dockerhub-ID'
+        IMAGE1_NAME = 'edwina07/user-service'
+        IMAGE2_NAME = 'edwina07/payment-service'
+        IMAGE3_NAME = 'edwina07/order-service'
+        REPO1_URL = 'https://github.com/edwinaabah/user-service.git'
+        REPO2_URL = 'https://github.com/edwinaabah/payment-service.git'
         REPO3_URL = 'https://github.com/ugbasawo/payment_service.git'
     }
     stages {
         stage('Git Checkout') {
             steps {
-                dir('search_service') {
+                dir('user-service') {
                     git url: REPO1_URL, branch: 'main'
                 }
-                dir('nortification_service') {
+                dir('payment-service') {
                     git url: REPO2_URL, branch: 'main'
                 }
-                dir('payment_service') { // Corrected directory name
+                dir('order-service') { // Corrected directory name
                     git url: REPO3_URL, branch: 'main'
                 }
             }
@@ -27,15 +27,15 @@ pipeline {
             steps {
                 script {
                     // Build the first Docker image
-                    dir('search_service') {
+                    dir('user-service') {
                         sh 'docker build -t ${IMAGE1_NAME} -f Dockerfile .'
                     }
                     // Build the second Docker image
-                    dir('nortification_service') {
+                    dir('payment-service') {
                         sh 'docker build -t ${IMAGE2_NAME} -f Dockerfile .'
                     }
                     // Build the third Docker image
-                    dir('payment_service') {
+                    dir('order-service') {
                         sh 'docker build -t ${IMAGE3_NAME} -f Dockerfile .'
                     }
                 }
@@ -43,7 +43,7 @@ pipeline {
         }
         stage('Push Docker Images to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-repo', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-ID', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
                     sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                     sh 'docker push ${IMAGE1_NAME}'
                     sh 'docker push ${IMAGE2_NAME}'
